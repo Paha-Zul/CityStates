@@ -1,0 +1,32 @@
+[[workers]]
+    name = "Gatherer"
+    initialCost = 10
+    dailyCost = 5
+    gathers = true
+    producesType = "basic"
+[[workers]]
+    name = "Processor"
+    initialCost = 20
+    dailyCost = 10
+    gathers = false
+    buysType = "basic"
+    producesType = "processed"
+[[workers]]
+    name = "Crafter"
+    initialCost = 30
+    dailyCost = 15
+    gathers = false
+    buysType = "processed"
+    producesType = "luxury"
+[[workers]]
+    name = "Mechant"
+    initialCost = 40
+    dailyCost = 20
+    gathers = false
+    buysType = "luxury"
+    producesType = "trade"
+[[workers]]
+    name = "Tax Collector"
+    buys = true
+    buysType = "trade"
+    buyable = false

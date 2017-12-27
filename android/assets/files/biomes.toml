@@ -1,0 +1,35 @@
+[[biomes]]
+    type = "Forest"
+    resources = [
+        {name = "Wood", amount = 3},
+        {name = "Hide", amount = 2},
+        {name = "Stone", amount = 1},
+    ]
+[[biomes]]
+    type = "Quarry"
+    resources = [
+        {name = "Stone", amount = 3},
+        {name = "Ore", amount = 2},
+        {name = "Wood", amount = 1},
+    ]
+[[biomes]]
+    type = "Mine"
+    resources = [
+        {name = "Ore", amount = 3},
+        {name = "Stone", amount = 2},
+        {name = "Fiber", amount = 1},
+    ]
+[[biomes]]
+    type = "Hunting Grounds"
+    resources = [
+        {name = "Hide", amount = 3},
+        {name = "Fiber", amount = 2},
+        {name = "Ore", amount = 1},
+    ]
+[[biomes]]
+    type = "Meadowland"
+    resources = [
+        {name = "Fiber", amount = 3},
+        {name = "Wood", amount = 2},
+        {name = "Hide", amount = 1},
+    ]

@@ -1,0 +1,114 @@
+[[resources]]
+    name = "Wood"
+    marketPrice = 1
+    type = "basic"
+[[resources]]
+    name = "Stone"
+    marketPrice = 1
+    type = "basic"
+[[resources]]
+    name = "Hide"
+    marketPrice = 1
+    type = "basic"
+[[resources]]
+    name = "Ore"
+    marketPrice = 1
+    type = "basic"
+[[resources]]
+    name = "Fiber"
+    marketPrice = 1
+    type = "basic"
+
+[[resources]]
+    name = "Plank"
+    marketPrice = 15
+    type = "processed"
+    reqs = [
+        {name = "Wood", amount = 10}
+    ]
+[[resources]]
+    name = "Brick"
+    marketPrice = 15
+    type = "processed"
+    reqs = [
+        {name = "Stone", amount = 10}
+    ]
+[[resources]]
+    name = "Leather"
+    marketPrice = 15
+    type = "processed"
+    reqs = [
+        {name = "Hide", amount = 10}
+    ]
+[[resources]]
+    name = "Metal"
+    marketPrice = 15
+    type = "processed"
+    reqs = [
+        {name = "Ore", amount = 10}
+    ]
+[[resources]]
+    name = "Cloth"
+    marketPrice = 15
+    type = "processed"
+    reqs = [
+        {name = "Fiber", amount = 10}
+    ]
+
+[[resources]]
+    name = "Carpentry Goods"
+    marketPrice = 500
+    type = "luxury"
+    reqs = [
+        {name = "Plank", amount = 10},
+        {name = "Metal", amount = 10},
+        {name = "Cloth", amount = 10}
+    ]
+[[resources]]
+    name = "Masonry Goods"
+    marketPrice = 500
+    type = "luxury"
+    reqs = [
+        {name = "Brick", amount = 10},
+        {name = "Leather", amount = 10},
+        {name = "Cloth", amount = 10}
+    ]
+[[resources]]
+    name = "Leathercraft Goods"
+    marketPrice = 500
+    type = "luxury"
+    reqs = [
+        {name = "Leather", amount = 10},
+        {name = "Plank", amount = 10},
+        {name = "Brick", amount = 10}
+    ]
+[[resources]]
+    name = "Metalsmith Goods"
+    marketPrice = 500
+    type = "luxury"
+    reqs = [
+        {name = "Plank", amount = 10},
+        {name = "Metal", amount = 10},
+        {name = "Leather", amount = 10}
+    ]
+[[resources]]
+    name = "Textile Goods"
+    marketPrice = 500
+    type = "luxury"
+    reqs = [
+        {name = "Cloth", amount = 10},
+        {name = "Brick", amount = 10},
+        {name = "Metal", amount = 10}
+    ]
+
+[[resources]]
+    name = "Trade Goods"
+    marketPrice = 30000
+    type = "trade"
+    reqs = [
+        {name = "Carpentry Goods", amount = 10},
+        {name = "Masonry Goods", amount = 10},
+        {name = "Leathercraft Goods", amount = 10},
+        {name = "Metalsmith Goods", amount = 10},
+        {name = "Textile Goods", amount = 10}                
+    ]
