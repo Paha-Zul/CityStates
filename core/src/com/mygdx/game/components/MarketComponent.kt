@@ -1,6 +1,7 @@
 package com.mygdx.game.components
 
 import com.badlogic.ashley.core.Component
+import com.badlogic.gdx.math.MathUtils
 import com.mygdx.game.objects.InventoryItem
 import com.mygdx.game.util.DefinitionManager
 import com.mygdx.game.objects.Transaction
@@ -80,15 +81,59 @@ class MarketComponent : Component {
     /**
      * Reserves an item for pickup in the market (outgoing)
      */
-    fun reserveItemInMarket(itemName:String, itemAmount:Int){
+    fun reserveOutgoingItem(itemName:String, itemAmount:Int):Int{
+        val item = itemMap.getOrPut(itemName, {InventoryItem(itemName, 0)})
 
+        //Clamp this between the negative outgoing and the total amount we have
+        //The negative outgoing allows us to accept negative numbers to reduce the outgoing amount
+        val amountToReserve = MathUtils.clamp(itemAmount, -item.outgoing, item.amount)
+        item.outgoing += amountToReserve //Add to the outgoing
+        item.amount -= amountToReserve //Take away from the available amount
+        //If the item is completely empty, remove it
+//        if(item.outgoing == 0 && item.amount == 0 && item.incoming == 0)
+//            itemMap.remove(itemName)
+        return amountToReserve
     }
 
     /**
      * Reserves an incoming item to the market
      */
-    fun reserveIncomingInMarket(itemName:String, itemAmount:Int){
+    fun reserveIncomingItem(itemName:String, itemAmount:Int):Int{
+        val item = itemMap.getOrPut(itemName, { InventoryItem(itemName, 0) })
 
+        //We can't take away more the than the item incoming, but we can add MAX_VALUE (infinite basically)
+        val amountToReserve = MathUtils.clamp(itemAmount, -item.incoming, Int.MAX_VALUE)
+
+        item.incoming += amountToReserve
+        return amountToReserve
+    }
+
+    fun getAmountInclIncoming(name:String):Int{
+        if(hasItem(name)) {
+            val item = itemMap[name]!!
+            return item.amount + item.incoming
+        }
+        return 0
+    }
+
+    /**
+     * @param name The name of the item
+     * @return True if the item is in the inventory, false otherwise.
+     */
+    fun hasItem(name:String):Boolean{
+        return itemMap.containsKey(name)
+    }
+
+    /**
+     * Gets the item amount if available
+     * @param name The name of the item
+     * @return The amount of the item or 0 if the item doesn't exist.
+     */
+    fun getAmount(name:String):Int{
+        if(hasItem(name))
+            return itemMap[name]!!.amount
+
+        return 0
     }
 
     fun getPriceOfItem(itemName:String):Int{

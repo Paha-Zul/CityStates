@@ -5,10 +5,14 @@ import com.mygdx.game.util.Mappers
 import com.mygdx.game.objects.WorkerGroup
 import com.mygdx.game.behaviours.BlackBoard
 import com.mygdx.game.behaviours.LeafTask
+import com.mygdx.game.components.MarketComponent
 
 class SetIncomingAndOutgoingItem(bb:BlackBoard) : LeafTask(bb) {
     lateinit var myGroup: WorkerGroup
     lateinit var otherGroup: WorkerGroup
+
+    lateinit var myMarket: MarketComponent
+    lateinit var otherMarket: MarketComponent
 
     var cleared = false
 
@@ -25,7 +29,11 @@ class SetIncomingAndOutgoingItem(bb:BlackBoard) : LeafTask(bb) {
         myGroup = myTown.workers[DefinitionManager.workerProcessTypeMap[worker.workerDef.producesType]!!.name]!!
         otherGroup = otherTown.workers[DefinitionManager.workerProcessTypeMap[worker.workerDef.buysType]!!.name]!!
 
-        val moneyNeeded = DefinitionManager.resourceMap[bb.targetItem.name]!!.marketPrice
+        myMarket = Mappers.market[worker.town]
+        otherMarket = Mappers.market[bb.targetEntity]
+
+        //Get the total money that's needed
+        val moneyNeeded = otherMarket.getAveragePriceForBuyingFromMarket(bb.targetItem.name, bb.targetItem.amount)
 
         //Check if we have enough gold. If we don't, fail here
         if(myGroup.gold < moneyNeeded){
@@ -34,8 +42,8 @@ class SetIncomingAndOutgoingItem(bb:BlackBoard) : LeafTask(bb) {
         }
 
         //TODO Need to check if it can be reserved here. The current method isn't working
-        val amount1 = myGroup.resources.reserveIncomingItem(bb.targetItem.name, bb.targetItem.amount)
-        val amount2 = otherGroup.resources.reserveOutgoingItem(bb.targetItem.name, bb.targetItem.amount)
+        val amount1 = myMarket.reserveIncomingItem(bb.targetItem.name, bb.targetItem.amount)
+        val amount2 = otherMarket.reserveOutgoingItem(bb.targetItem.name, bb.targetItem.amount)
 
 //        val item1 = myGroup.resources.itemMap[bb.targetItem.name]
 //        val item2 = otherGroup.resources.itemMap[bb.targetItem.name]
@@ -67,7 +75,7 @@ class SetIncomingAndOutgoingItem(bb:BlackBoard) : LeafTask(bb) {
 
             //TODO Finalize needs to only be called when the task was actually started. Do we need a finished variable?
             //Notice how the amount items are reversed from above. We want to cancel out the reserving
-            myGroup.resources.reserveIncomingItem(bb.targetItem.name, -bb.targetItem.amount)
+            myMarket.reserveIncomingItem(bb.targetItem.name, -bb.targetItem.amount)
 //            otherGroup.resources.reserveOutgoingItem(bb.targetItem.name, -bb.targetItem.amount)
 
             cleared = true

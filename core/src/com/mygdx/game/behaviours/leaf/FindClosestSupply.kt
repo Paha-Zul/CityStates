@@ -12,12 +12,17 @@ import com.mygdx.game.components.ResourceNodeComponent
 import com.mygdx.game.components.TownComponent
 import com.mygdx.game.components.TransformComponent
 
+/**
+ * Finds the closest supply
+ * @param basic If true, finds a basic supply from a resource node. If false, finds a supply from a town
+ */
 class FindClosestSupply(bb:BlackBoard, private val basic:Boolean = true) : LeafTask(bb) {
     override fun start() {
         super.start()
 
         val tc = Mappers.transform[bb.myself]
 
+        //TODO Maybe I should just split this into its own behaviour? But it's so similar...
         if(basic) {
             val nodeList = MyGame.entityEngine.getEntitiesFor(Family.all(ResourceNodeComponent::class.java).get())
             bb.targetEntity = findClosestBasicSupply(tc, nodeList)
@@ -52,20 +57,26 @@ class FindClosestSupply(bb:BlackBoard, private val basic:Boolean = true) : LeafT
         val worker = Mappers.worker[bb.myself]
         //My town
         val myTown = Mappers.worker[bb.myself].town
+        //My market
+        val myMarket = Mappers.market[myTown]
         //My worker group
         val myWorkerGroup = Mappers.town[myTown].workers[worker.workerDef.name]!!
         //This is the resource type we want to buy
         val resourceType = worker.workerDef.buysType
         //This is the worker type needed
         val workerTypeNeeded = DefinitionManager.workerProcessTypeMap[resourceType]!!
+
         //Sort the towns from nearest to furthest
         val sorted = townList.sortedBy { Mappers.transform[it].position.dst2(tc.position) }
-
 
         //For each town from nearest to furthest...
         sorted.forEach { townEnt ->
             //Actually, we don't mind searching our own town here. If our own town is the closest, then use that
+            val market = Mappers.market[townEnt]
             val town = Mappers.town[townEnt]
+
+            //TODO We need to get a list of all needed items to craft something (like plank, metal, cloth -> carpentry good)
+            //TODO And then check the foreign market for it against our WORKER GROUP (not market) cause that's where we store bought materials
 
             //Get the worker group we need
             val targetWorkerGroup = town.workers[workerTypeNeeded.name]!!

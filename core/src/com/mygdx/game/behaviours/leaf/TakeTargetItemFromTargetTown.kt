@@ -15,13 +15,18 @@ class TakeTargetItemFromTargetTown(bb:BlackBoard) : LeafTask(bb) {
         val otherTown = Mappers.town[bb.targetEntity]
 
         //Get the worker group that has the item we need
-        val workerGroup = otherTown.workers[DefinitionManager.workerProcessTypeMap[myWorker.workerDef.buysType]!!.name]!!
+//        val workerGroup = otherTown.workers[DefinitionManager.workerProcessTypeMap[myWorker.workerDef.buysType]!!.name]!!
+        val otherMarket = Mappers.market[bb.targetEntity]
 
         val itemDef = DefinitionManager.resourceMap[bb.targetItem.name]!!
 
         //Remove (or try) the amount from the worker group. Add it to my inventory
-        val amountRemoved = workerGroup.resources.takeOutgoingItem(bb.targetItem.name, bb.targetItem.amount)
-        myInventory.addItem(bb.targetItem.name, amountRemoved)
+//        val amountRemoved = workerGroup.resources.takeOutgoingItem(bb.targetItem.name, bb.targetItem.amount)
+//        myInventory.addItem(bb.targetItem.name, amountRemoved)
+
+        //TODO Need to account for gold transfer here
+        val itemRemoved = otherMarket.buyItemFromMarket(bb.targetItem.name, bb.targetItem.amount)
+        myInventory.addItem(bb.targetItem.name, itemRemoved.amount)
 
         controller.finishWithSuccess()
     }

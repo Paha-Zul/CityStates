@@ -146,7 +146,6 @@ class InventoryComponent : Component {
             val item = itemMap[name]!!
             return item.amount + item.incoming
         }
-
         return 0
     }
 
