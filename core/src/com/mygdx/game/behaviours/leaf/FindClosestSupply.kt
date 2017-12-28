@@ -11,6 +11,7 @@ import com.mygdx.game.behaviours.LeafTask
 import com.mygdx.game.components.ResourceNodeComponent
 import com.mygdx.game.components.TownComponent
 import com.mygdx.game.components.TransformComponent
+import com.mygdx.game.objects.NameAmountLink
 
 /**
  * Finds the closest supply
@@ -66,33 +67,42 @@ class FindClosestSupply(bb:BlackBoard, private val basic:Boolean = true) : LeafT
         //This is the worker type needed
         val workerTypeNeeded = DefinitionManager.workerProcessTypeMap[resourceType]!!
 
+        //Compile a list of all potential items we can buy to make our item
+        val listOfItemsNeeded = mutableListOf<String>()
+        DefinitionManager.resourceTypeMap[resourceType]!!.forEach{ listOfItemsNeeded.add(it.name) }
+
         //Sort the towns from nearest to furthest
         val sorted = townList.sortedBy { Mappers.transform[it].position.dst2(tc.position) }
 
         //For each town from nearest to furthest...
         sorted.forEach { townEnt ->
             //Actually, we don't mind searching our own town here. If our own town is the closest, then use that
-            val market = Mappers.market[townEnt]
+            val otherMarket = Mappers.market[townEnt]
             val town = Mappers.town[townEnt]
-
-            //TODO We need to get a list of all needed items to craft something (like plank, metal, cloth -> carpentry good)
-            //TODO And then check the foreign market for it against our WORKER GROUP (not market) cause that's where we store bought materials
 
             //Get the worker group we need
             val targetWorkerGroup = town.workers[workerTypeNeeded.name]!!
-            //Get the resource list based on THE WORKER TYPE that we are.
-            //We are trying to find an empty resource in the worker's group to fill.
-            val resourceList = DefinitionManager.resourceTypeMap[resourceType]!!
-            //Filter any items that the targetWorkerGroup doesn't have
-            .filter { targetWorkerGroup.resources.getAmount(it.name) != 0
-            //Sort the filtered list by the amount that my group currently has. This should hopefully balance the items
-            }.sortedWith(compareBy({myWorkerGroup.resources.getAmountInclIncoming(it.name)}))
+
+            //TODO We need to get a list of all needed items to craft something (like plank, metal, cloth -> carpentry good)
+            //TODO And then check the foreign market for it against our WORKER GROUP (not market) cause that's where we store bought materials
+            val availableItems = listOfItemsNeeded
+                    .filter { otherMarket.getAvailableAmount(it) != 0 } //Filter any items that are 0 (empty) in the market
+                    .sortedBy { myWorkerGroup.resources.getAmountInclIncoming(it) } //Sort from least to greatest
+
+
+//            //Get the resource list based on THE WORKER TYPE that we are.
+//            //We are trying to find an empty resource in the worker's group to fill.
+//            val resourceList = DefinitionManager.resourceTypeMap[resourceType]!!
+//            //Filter any items that the targetWorkerGroup doesn't have
+//            .filter { targetWorkerGroup.resources.getAmount(it.name) != 0
+//            //Sort the filtered list by the amount that my group currently has. This should hopefully balance the items
+//            }.sortedWith(compareBy({myWorkerGroup.resources.getAmountInclIncoming(it.name)}))
 
             //This is under the .filter conditions. We're trying it without it
             //myWorkerGroup.resources.getAmount(it.name) == 0 &&
 
-            if (resourceList.isNotEmpty()) { //If the resource is 0, return this town
-                bb.targetItem.apply { name = resourceList[0].name; amount = 1 }
+            if (availableItems.isNotEmpty()) { //If the resource is 0, return this town
+                bb.targetItem.apply { name = availableItems[0]; amount = 1 }
                 return townEnt
             }
         }

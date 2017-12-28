@@ -55,9 +55,12 @@ class EntityWindow(val entity: Entity) : GUIWindow() {
         }
 
         val marketTable = Table()
-        marketTable.add(Label("------- Market -------", labelStyle)).row()
+        val titleLabel = Label("Market, Gold: ${market.marketMoney}", labelStyle)
+        marketTable.add(titleLabel).row()
+        marketTable.add(Label("--------------", labelStyle)).row()
         val marketItemsTable = Table()
         updateFuncs.add {
+            titleLabel.setText("Market, Gold: ${market.marketMoney}")
             val itemList = market.getAllItems()
             makeInventoryTable(itemList, labelStyle, marketItemsTable)
         }

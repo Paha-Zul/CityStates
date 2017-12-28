@@ -76,7 +76,7 @@ class SetIncomingAndOutgoingItem(bb:BlackBoard) : LeafTask(bb) {
             //TODO Finalize needs to only be called when the task was actually started. Do we need a finished variable?
             //Notice how the amount items are reversed from above. We want to cancel out the reserving
             myMarket.reserveIncomingItem(bb.targetItem.name, -bb.targetItem.amount)
-//            otherGroup.resources.reserveOutgoingItem(bb.targetItem.name, -bb.targetItem.amount)
+//            otherMarket.reserveOutgoingItem(bb.targetItem.name, -bb.targetItem.amount)
 
             cleared = true
         }

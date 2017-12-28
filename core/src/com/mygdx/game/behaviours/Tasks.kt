@@ -14,7 +14,7 @@ object Tasks {
             SetMyTownAsTarget(bb),
             MoveTo(bb),
             ChangeHidden(bb, true),
-            TransferInventoryToTown(bb)
+            TransferInventoryToTown(bb, true)
         )
         //Find closest supply
         //Walk to closest supply
@@ -58,7 +58,7 @@ object Tasks {
                 TakeTargetItemFromTargetTown(bb),
                 SetMyTownAsTarget(bb),
                 MoveTo(bb),
-                TransferInventoryToTown(bb)
+                TransferInventoryToTown(bb, false)
         )
 
         //A selector to either buy from my own town or another town

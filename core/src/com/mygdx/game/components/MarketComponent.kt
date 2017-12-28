@@ -10,7 +10,8 @@ import com.mygdx.game.objects.Transaction
  * Probably will be pretty similar to the inventory component but with specialized functions
  */
 class MarketComponent : Component {
-    private var marketMoney = 50000
+    var marketMoney = 50000
+        private set
 
     private val itemMap = hashMapOf<String, InventoryItem>()
     private val itemPriceMap = hashMapOf<String, Int>()
@@ -54,6 +55,8 @@ class MarketComponent : Component {
 
         marketMoney += totalPrice //Add the money to the market
         item.amount -= amountAbleToBuy //Subtract the item from the market
+        item.outgoing -= amountAbleToBuy //Subtract it also from the outgoing items. This should usually work?
+        //TODO WATCH THIS AREA ABOVE, DO ENTITIES ALWAYS BUY A RESERVED ITEM?
 
         return Transaction(itemName, amountAbleToBuy, itemPrice)
     }
@@ -86,9 +89,9 @@ class MarketComponent : Component {
 
         //Clamp this between the negative outgoing and the total amount we have
         //The negative outgoing allows us to accept negative numbers to reduce the outgoing amount
-        val amountToReserve = MathUtils.clamp(itemAmount, -item.outgoing, item.amount)
+        val amountToReserve = MathUtils.clamp(itemAmount, 0, item.amount - item.outgoing)
         item.outgoing += amountToReserve //Add to the outgoing
-        item.amount -= amountToReserve //Take away from the available amount
+//        item.amount -= amountToReserve //Take away from the available amount
         //If the item is completely empty, remove it
 //        if(item.outgoing == 0 && item.amount == 0 && item.incoming == 0)
 //            itemMap.remove(itemName)
@@ -114,6 +117,15 @@ class MarketComponent : Component {
             return item.amount + item.incoming
         }
         return 0
+    }
+
+    /**
+     * Gets the amount of the item available (which is the amount not reserved)
+     * @param name The name of the item
+     */
+    fun getAvailableAmount(name:String):Int{
+        val item = itemMap[name] ?: return 0
+        return item.amount - item.outgoing
     }
 
     /**
