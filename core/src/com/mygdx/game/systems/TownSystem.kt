@@ -39,7 +39,8 @@ class TownSystem : EntitySystem() {
             towns.forEach { town ->
                 val townComp = Mappers.town[town]
                 townComp.workers.values.forEach { group ->
-                    group.dailyTransactionAverages.add(group.dailyTransactions.sumBy { it.totalPrice })
+                    //TODO Do we really want to truncate the total price? It's a FLOAT and toInt() is the easy way out
+                    group.dailyTransactionAverages.add(group.dailyTransactions.sumBy { it.totalPrice.toInt() })
                     group.dailyTransactions = Array() //Clear the list
                 }
             }
@@ -56,7 +57,7 @@ class TownSystem : EntitySystem() {
             if(workerDef.buyable) {
                 town.workers.put(workerDef.name, WorkerGroup().apply {
                     type = workerDef.name
-                    gold = 30000
+                    gold = 30000f
 
                     //An inner function for adding a worker
                     fun addWorker() {
@@ -81,7 +82,7 @@ class TownSystem : EntitySystem() {
                         if (this.gold >= workerDef.initialCost) {
                             addWorker()
                             //Add a transaction for buying a worker
-                            dailyTransactions.add(Transaction("Worker Bought", 1, -workerDef.initialCost))
+                            dailyTransactions.add(Transaction("Worker Bought", 1, -workerDef.initialCost.toFloat()))
                             this.gold -= workerDef.initialCost
                         }
 

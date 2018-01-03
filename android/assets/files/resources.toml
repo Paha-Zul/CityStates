@@ -1,5 +1,5 @@
 [[resources]]
-    name = "Wood"
+    name = "Log"
     marketPrice = 1
     type = "basic"
 [[resources]]
@@ -24,7 +24,7 @@
     marketPrice = 15
     type = "processed"
     reqs = [
-        {name = "Wood", amount = 10}
+        {name = "Log", amount = 10}
     ]
 [[resources]]
     name = "Brick"

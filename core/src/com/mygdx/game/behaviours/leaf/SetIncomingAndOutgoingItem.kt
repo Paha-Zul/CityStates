@@ -42,23 +42,30 @@ class SetIncomingAndOutgoingItem(bb:BlackBoard) : LeafTask(bb) {
         }
 
         //TODO Need to check if it can be reserved here. The current method isn't working
-        val amount1 = myMarket.reserveIncomingItem(bb.targetItem.name, bb.targetItem.amount)
-        val amount2 = otherMarket.reserveOutgoingItem(bb.targetItem.name, bb.targetItem.amount)
+        //First try to reserve an outgoing item from the other market
+        val reserveOutgoingAmount = otherMarket.reserveOutgoingItem(bb.targetItem.name, bb.targetItem.amount)
 
-//        val item1 = myGroup.resources.itemMap[bb.targetItem.name]
-//        val item2 = otherGroup.resources.itemMap[bb.targetItem.name]
-
-//        println("\n -- Reserving --")
-//        println("mine: $item1")
-//        println("other: $item2")
-//        println(" -- Reserving -- \n")
-
-        if(amount1 != bb.targetItem.amount || amount2 != bb.targetItem.amount){
+        //If we couldn't reserve the item, unreserve the attempt and return
+        if(reserveOutgoingAmount <= 0){
             controller.finishWithFailure()
-            unreserveItems()
-//            println("Failed reserving")
+            otherMarket.reserveOutgoingItem(bb.targetItem.name, -bb.targetItem.amount)
+            controller.finishWithFailure()
             return
         }
+
+        //Try to reserve an incoming item to our WORKER GROUP
+        val reserveIncomingAmount = myGroup.resources.reserveIncomingItem(bb.targetItem.name, reserveOutgoingAmount)
+
+        //If we couldn't reserve incoming or it doesn't match the outgoing amount, unreserve all and fail
+        if(reserveIncomingAmount <= 0 || reserveIncomingAmount != reserveOutgoingAmount){
+            controller.finishWithFailure()
+            myGroup.resources.reserveIncomingItem(bb.targetItem.name, -bb.targetItem.amount)
+            otherMarket.reserveOutgoingItem(bb.targetItem.name, -bb.targetItem.amount)
+            controller.finishWithFailure()
+            return
+        }
+
+        bb.targetItem.amount = reserveOutgoingAmount
 
         controller.finishWithSuccess()
     }
@@ -75,7 +82,7 @@ class SetIncomingAndOutgoingItem(bb:BlackBoard) : LeafTask(bb) {
 
             //TODO Finalize needs to only be called when the task was actually started. Do we need a finished variable?
             //Notice how the amount items are reversed from above. We want to cancel out the reserving
-            myMarket.reserveIncomingItem(bb.targetItem.name, -bb.targetItem.amount)
+            myGroup.resources.reserveIncomingItem(bb.targetItem.name, -bb.targetItem.amount)
 //            otherMarket.reserveOutgoingItem(bb.targetItem.name, -bb.targetItem.amount)
 
             cleared = true

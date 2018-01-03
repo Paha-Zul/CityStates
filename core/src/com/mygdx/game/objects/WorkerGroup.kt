@@ -8,7 +8,7 @@ import com.mygdx.game.components.InventoryComponent
 class WorkerGroup {
     var type = ""
     val workers:Array<Entity> = Array()
-    var gold = 0
+    var gold = 0f
     var resources = InventoryComponent()
     var dailyTransactions = Array<Transaction>()
     var dailyTransactionAverages:EvictingQueue<Int> = EvictingQueue.create(7)

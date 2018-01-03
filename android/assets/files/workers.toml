@@ -2,8 +2,11 @@
     name = "Gatherer"
     initialCost = 10
     dailyCost = 5
-    gathers = true
-    producesType = "basic"
+    gathers = true # Optional gathers
+    gathersType = "" # Optional gathers type
+    gathersItemName = "" # Optional gathers item name. This will take priority over gathers type
+    producesType = "basic" # Optional produces type
+    producesItemName = "" # Optional produces item name. This will take priority over produces type
 [[workers]]
     name = "Processor"
     initialCost = 20

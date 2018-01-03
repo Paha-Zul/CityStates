@@ -9,11 +9,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.mygdx.game.util.DefinitionManager
 import com.mygdx.game.util.Mappers
 import com.mygdx.game.MyGame
+import com.mygdx.game.components.MarketComponent
 import com.mygdx.game.util.Util
 import com.mygdx.game.objects.InventoryItem
+import java.math.BigDecimal
+import java.text.DecimalFormat
 
 class EntityWindow(val entity: Entity) : GUIWindow() {
     val mainTable = Table()
+    val formatter = DecimalFormat("#.00")
 
     init {
         mainTable.setSize(400f, 600f)
@@ -55,14 +59,13 @@ class EntityWindow(val entity: Entity) : GUIWindow() {
         }
 
         val marketTable = Table()
-        val titleLabel = Label("Market, Gold: ${market.marketMoney}", labelStyle)
+        val titleLabel = Label("Market", labelStyle)
         marketTable.add(titleLabel).row()
         marketTable.add(Label("--------------", labelStyle)).row()
         val marketItemsTable = Table()
         updateFuncs.add {
-            titleLabel.setText("Market, Gold: ${market.marketMoney}")
             val itemList = market.getAllItems()
-            makeInventoryTable(itemList, labelStyle, marketItemsTable)
+            makeInventoryTableForMarketItem(market, itemList, labelStyle, marketItemsTable)
         }
 
         marketTable.add(marketItemsTable)
@@ -76,11 +79,27 @@ class EntityWindow(val entity: Entity) : GUIWindow() {
         table.clear()
 
         items.forEach { item ->
+            val text = "${item.name}: Amount: ${item.amount}, Incoming: ${item.incoming}, Outgoing: ${item.outgoing}"
             val itemLabel = Label("${item.name}: Amount: ${item.amount}, Incoming: ${item.incoming}, Outgoing: ${item.outgoing}", labelStyle)
             table.add(itemLabel)
             table.row()
         }
 
+        return table
+    }
+
+    private fun makeInventoryTableForMarketItem(market:MarketComponent, items:List<InventoryItem>,
+                                                labelStyle: Label.LabelStyle, table:Table = Table()):Table{
+        table.clear()
+
+        items.forEach { item ->
+            val text = "${item.name}: Amount: ${item.amount}, Incoming: ${item.incoming}, Outgoing: ${item.outgoing}, " +
+                    "Price: ${formatter.format(market.getAveragePriceForBuyingFromMarket(item.name, 1))}"
+
+            val itemLabel = Label(text, labelStyle)
+            table.add(itemLabel)
+            table.row()
+        }
         return table
     }
 

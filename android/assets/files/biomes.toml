@@ -1,7 +1,7 @@
 [[biomes]]
     type = "Forest"
     resources = [
-        {name = "Wood", amount = 3},
+        {name = "Log", amount = 3},
         {name = "Hide", amount = 2},
         {name = "Stone", amount = 1},
     ]
@@ -10,7 +10,7 @@
     resources = [
         {name = "Stone", amount = 3},
         {name = "Ore", amount = 2},
-        {name = "Wood", amount = 1},
+        {name = "Log", amount = 1},
     ]
 [[biomes]]
     type = "Mine"
@@ -30,6 +30,6 @@
     type = "Meadowland"
     resources = [
         {name = "Fiber", amount = 3},
-        {name = "Wood", amount = 2},
+        {name = "Log", amount = 2},
         {name = "Hide", amount = 1},
     ]

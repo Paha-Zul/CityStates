@@ -29,18 +29,18 @@ class TransferMoneyForPurchase(bb:BlackBoard, private val fromTown:Boolean = tru
 
         //Get the market price of the item
         val itemListOfType = DefinitionManager.resourceTypeMap[workerDef.buysType]!! //We get the item list of the TYPE that the worker buys
-        val marketPrice = itemListOfType.first { it.name == bb.targetItem.name }.marketPrice
+        val marketPrice = itemListOfType.first { it.name == bb.targetItem.name }.marketPrice.toFloat()
 
         //If it's from the town AND my group has enough money for 1 of the resource
         if(fromTown && myWorkerGroup.gold >= marketPrice){
             //Take away from my worker group and give to my inventory
-            workerInventory.addItem("Gold", marketPrice)
+            workerInventory.money += marketPrice
             myWorkerGroup.gold -= marketPrice //Remove gold from my worker group
             myWorkerGroup.dailyTransactions.add(Transaction(bb.targetItem.name, bb.targetItem.amount, -marketPrice)) //Add a new transaction showing we lost gold
             controller.finishWithSuccess()
         }else if(!fromTown){
             //Remove gold from my inventory and give to the target group
-            workerInventory.removeItem("Gold", marketPrice)
+            workerInventory.money -= marketPrice
             targetWorkerGroup.gold += marketPrice //Add gold to the target worker group
             targetWorkerGroup.dailyTransactions.add(Transaction(bb.targetItem.name, bb.targetItem.amount, marketPrice)) //Add a new transaction showing we gained gold
             controller.finishWithSuccess()

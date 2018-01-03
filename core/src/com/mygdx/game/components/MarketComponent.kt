@@ -10,11 +10,10 @@ import com.mygdx.game.objects.Transaction
  * Probably will be pretty similar to the inventory component but with specialized functions
  */
 class MarketComponent : Component {
-    var marketMoney = 50000
-        private set
-
     private val itemMap = hashMapOf<String, InventoryItem>()
-    private val itemPriceMap = hashMapOf<String, Int>()
+    private val itemPriceMap = hashMapOf<String, Float>()
+
+    private val percentChange = 0.01f
 
     /**
      * Sells an item to the market
@@ -32,28 +31,39 @@ class MarketComponent : Component {
         //But for now we're just gonna lay down some temp code
         val itemPrice = getAveragePriceForSellingToMarket(itemName, itemAmount) //Get the item price
         //The amount the market can take. Either all of the item or the amount bound by the market money
-        val amountAbleToSell = Math.min(itemAmount, marketMoney/itemPrice)
-        val totalPrice = amountAbleToSell*itemPrice //Get the total price for the transaction
+//        val totalPrice = itemAmount*itemPrice //Get the total price for the transaction
 
-        marketMoney -= totalPrice //Subtract this from the market money
-        item.amount += amountAbleToSell //Add the item amount to the market (we are selling TO the market)
+        var adjustedPrice = itemPrice
+        for(i in 0 until itemAmount)
+            adjustedPrice -= adjustedPrice*percentChange
 
-        return Transaction(itemName, amountAbleToSell, itemPrice)
+        itemPriceMap.put(itemName, adjustedPrice)
+
+        item.amount += itemAmount //Add the item amount to the market (we are selling TO the market)
+
+//        if(itemAmount > 1)
+//            println("Amount is more than 1 $itemAmount")
+
+        return Transaction(itemName, itemAmount, itemPrice)
     }
 
     /**
      * Buys an item from the market
      */
     fun buyItemFromMarket(itemName:String, itemAmount:Int): Transaction {
-        val item = itemMap[itemName] ?: return Transaction(itemName, 0, 0)
+        val item = itemMap[itemName] ?: return Transaction(itemName, 0, 0f)
 
         //But for now we're just gonna lay down some temp code
         val itemPrice = getAveragePriceForBuyingFromMarket(itemName, itemAmount)
         //The amount the market can give away. Either all of the inventory item or the amount requested by the buyer
         val amountAbleToBuy = Math.min(item.amount, itemAmount)
-        val totalPrice = amountAbleToBuy*itemPrice //Get the total price for the transaction
 
-        marketMoney += totalPrice //Add the money to the market
+        val adjustedPrice = itemPrice + itemPrice*percentChange
+        itemPriceMap.put(itemName, adjustedPrice)
+
+//        if(itemAmount > 1)
+//            println("Amount is more than 1 $itemAmount")
+
         item.amount -= amountAbleToBuy //Subtract the item from the market
         item.outgoing -= amountAbleToBuy //Subtract it also from the outgoing items. This should usually work?
         //TODO WATCH THIS AREA ABOVE, DO ENTITIES ALWAYS BUY A RESERVED ITEM?
@@ -66,19 +76,28 @@ class MarketComponent : Component {
      * @param itemName The name of the item
      * @param itemAmount The amount of the item
      */
-    fun getAveragePriceForSellingToMarket(itemName:String, itemAmount:Int):Int{
+    fun getAveragePriceForSellingToMarket(itemName:String, itemAmount:Int):Float{
         //TODO Actually implement this
-        return itemPriceMap.getOrPut(itemName, {DefinitionManager.resourceMap[itemName]!!.marketPrice}) //Get the price of the item
+
+        return itemPriceMap.getOrPut(itemName, {
+            val price = DefinitionManager.resourceMap[itemName]!!.marketPrice.toFloat()
+            price + price*0.75f
+        }) //Get the price of the item
     }
 
     /**
      * Calculates the average price when buying items from the market
      * @param itemName The name of the item
      * @param itemAmount The amount of the item
+     * @return The average price of the item in the market.
      */
-    fun getAveragePriceForBuyingFromMarket(itemName:String, itemAmount:Int):Int{
+    fun getAveragePriceForBuyingFromMarket(itemName:String, itemAmount:Int = 1):Float{
         //TODO Actually implement this
-        return itemPriceMap.getOrPut(itemName, {DefinitionManager.resourceMap[itemName]!!.marketPrice}) //Get the price of the item
+
+        return itemPriceMap.getOrPut(itemName, {
+            val price = DefinitionManager.resourceMap[itemName]!!.marketPrice.toFloat()
+            price + price*0.75f
+        }) //Get the price of the item
     }
 
     /**
@@ -146,10 +165,6 @@ class MarketComponent : Component {
             return itemMap[name]!!.amount
 
         return 0
-    }
-
-    fun getPriceOfItem(itemName:String):Int{
-        return itemPriceMap.getOrPut(itemName, {DefinitionManager.resourceMap[itemName]!!.marketPrice})
     }
 
     fun getAllItems():List<InventoryItem>{

@@ -9,6 +9,8 @@ import com.mygdx.game.objects.InventoryItem
  * Created by Paha on 12/14/2016.
  */
 class InventoryComponent : Component {
+    var money = 0f
+
     val itemMap = hashMapOf<String, InventoryItem>()
 
     /** A list of listeners for inventory changes.*/
